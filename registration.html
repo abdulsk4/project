@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration </title>
+    <!-- <link rel="stylesheet" href="form.css"> -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,700;1,400&display=swap');
+
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body{
+    background-color: rgb(153, 153, 236);
+    padding: 0 10px;
+}
+
+.whole{
+    max-width: 500px;
+    width: 100%;
+    height: 100%;
+    margin: 300px;
+    background-color: white;
+    margin: 20px auto;
+    padding: 30px;
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.125);
+    border-radius: 20px;
+
+}
+
+h2{
+    text-align: center;
+}
+
+.whole .form{
+    width: 100%;
+
+}
+
+.whole .form .inputform{
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.whole .form .inputform label{
+    width: 200px;
+    color: #757575;
+    margin-right: 10px;
+    font-size: 20px;
+}
+
+.whole .form .inputform .input{
+    width: 100%;
+    outline: none;
+    border: 1px solid #3b423f;
+    font-size: 12px;
+    padding: 7px 10px;
+    border-radius: 7px;
+    transition: all 0.3s ease;
+    
+
+}
+
+.whole .form .inputform .terms{
+    width: 15px;
+    height: 15px;
+    position: relative;
+    display: block;
+    cursor: pointer;
+}
+
+.whole .form .inputform .terms input[type="checkbox"]{
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+}
+
+.whole .form .inputform #submit{
+    border-radius: 5px;
+    margin-left: 35%;
+    height: 40px;
+    width: 100px;
+    background-color: aqua;
+    /* position: absolute; */
+    
+}
+.whole .form .inputform #submit:hover{
+    cursor: pointer;
+}
+
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+  }
+    </style>
+    
+</head>
+<body >
+    <div class="whole">
+        <h2 class="title">Registration Form</h2>
+        <br>
+        <form class="form" id="form">
+            <div class="inputform">
+                <label for="name">User Name:</label>
+                <input required type="text" id="name" name="name" class="input" >
+            </div>
+
+            <div class="inputform">
+                <label for="email">Email:</label>
+                <input required type="email" id="email" name="email" class="input">
+            </div>
+
+            <div class="inputform">
+                <label for="password">Password</label>
+                <input required type="password" id="password"name="password" class="input">
+            </div>
+
+            <div class="inputform">
+                <label for="dob">Date of Birth:</label>
+                <input required type="date" id="dob" name="dob" class="input">
+            </div>
+            
+            
+            <!-- <div class="inputform">
+                <label>Gender</label>
+                <select class="input">
+                    <option value="">Select</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+            </div> -->
+            <div class="terms">
+                <input type="checkbox" id="acceptTerms" name="checkbox">
+                <label for="acceptTerms">Accept Terms & Conditions</label>
+            </div>
+
+            <div class="inputform">
+                <input type="submit" id="submit" value="Submit">
+            </div>
+        </form>
+    </div>
+    <div id="displayTable"></div>
+    <script>
+        const email = document.getElementById("email");
+email.addEventListener("input", () => validate(email));
+function validate(mail) {
+  if (mail.validity.typeMismatch) {
+    mail.setCustomValidity("Please enter valid email.");
+    mail.reportValidity();
+  } else {
+    mail.setCustomValidity("");
+  }
+}
+function validateAge(today, dobobj) {
+  var age = today.getFullYear() - dobobj.getFullYear();
+  var m = today.getMonth() - dobobj.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < dobobj.getDate())) {
+    age--;
+  }
+  return age;
+}
+let dobelement = document.getElementById("dob");
+dobelement.addEventListener("change", () => {
+  let [y,m,d] = document.getElementById("dob").value.split("-");
+  let dob = new Date(y,m,d);
+  let Today = new Date();
+  age = validateAge(Today, dob);
+  if (age < 18 || age > 55) {
+    dobelement.setCustomValidity("Age should lie between 18 and 55.");
+ 
+    return;
+  } else {
+    dobelement.setCustomValidity("");
+  }
+});
+let form = document.getElementById("form");
+
+const retriveEntries = () => {
+  let entries = localStorage.getItem("userEntry");
+
+  if (entries) {
+    entries = JSON.parse(entries);
+  } else {
+    entries = [];
+  }
+  return entries;
+};
+
+let Entries = retriveEntries();
+
+const displayEntries = () => {
+  const entries = retriveEntries();
+
+  const tablerows = entries
+    .map((entry) => {
+      const name = `<td>${entry.name}</td>`;
+      const email = `<td>${entry.email}</td>`;
+      const password = `<td>${entry.password}</td>`;
+      const dob = `<td>${entry.dob}</td>`;
+      const acceptTerms = `<td>${entry.acceptTerms}</td>`;
+
+      const row = `<tr>${name} ${email} ${password} ${dob} ${acceptTerms}</tr>`;
+      return row;
+    })
+    .join("\n");
+
+  let tableDiv = document.getElementById("displayTable");
+
+  tableDiv.innerHTML = `<table>
+  <tr>
+    <th>Name</th>
+    <th>Email</th>
+    <th>Password</th>
+    <th>Dob</th>
+    <th>Accepted terms?</th>
+  </tr>
+    ${tablerows}
+  </table>`;
+};
+
+const saveUserFrom = (event) => {
+  event.preventDefault();
+
+  let name = document.getElementById("name").value;
+  let email = document.getElementById("email").value;
+  let password = document.getElementById("password").value;
+  let dob = document.getElementById("dob").value;
+  let acceptTerms = document.getElementById("acceptTerms").checked;
+
+  let entry_obj = {
+    name,
+    email,
+    password,
+    dob,
+    acceptTerms,
+  };
+
+  Entries.push(entry_obj);
+
+  localStorage.setItem("userEntry", JSON.stringify(Entries));
+
+  displayEntries();
+};
+
+form.addEventListener("submit", saveUserFrom);
+
+displayEntries();
+    </script>
+</body>
+</html>
